@@ -9,7 +9,7 @@ from django.core.serializers.xml_serializer import Serializer as _XmlSerializer
 from django.db import models
 from django.db.models.base import ModelBase
 from django.db.models.fields import Field
-from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
+from django.db.models.query_utils import DeferredAttribute
 from django.utils.encoding import smart_text
 from django.utils.six import with_metaclass
 
