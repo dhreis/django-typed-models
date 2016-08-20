@@ -179,7 +179,7 @@ class TypedModelMetaclass(ModelBase):
                 manager = cls._default_manager
             if manager is not None:
                 cls.add_to_class('objects', manager)
-                cls._default_manager = cls.objects
+                #cls._default_manager = cls.objects
 
             # add a get_type_classes classmethod to allow fetching of all the subclasses (useful for admin)
 
@@ -301,9 +301,13 @@ def get_deferred_class_for_instance(instance, desired_class):
     """
     Returns a deferred class (as used by instances in a .defer() queryset).
     """
-    original_cls = instance.__class__
-    attrs = [k for (k, v) in original_cls.__dict__.items() if isinstance(v, DeferredAttribute)]
-    return deferred_class_factory(desired_class, attrs)
+    #original_cls = instance.__class__
+    attrs = instance.get_deferred_fields()
+    for attname in attrs:
+        setattr(desired_class, attname, DeferredAttribute(attname, desired_class))
+    #attrs = [k for (k, v) in original_cls.__dict__.items() if isinstance(v, DeferredAttribute)]
+    #return deferred_class_factory(desired_class, attrs)
+    return desired_class
 
 
 class TypedModel(with_metaclass(TypedModelMetaclass, models.Model)):
@@ -407,7 +411,7 @@ class TypedModel(with_metaclass(TypedModelMetaclass, models.Model)):
         current_cls = self.__class__
 
         if current_cls != correct_cls:
-            if self._deferred:
+            if len(self.get_deferred_fields()) > 0:
                 # create a new deferred class based on correct_cls instead of current_cls
                 correct_cls = get_deferred_class_for_instance(self, correct_cls)
             self.__class__ = correct_cls
